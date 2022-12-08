@@ -10,3 +10,139 @@ Therefore, it will be necessary to use a background image with several layers. I
 
 Continuing, the background image to be used is shown below:
 
+<p align="center">
+<img width="600" src="/Figures/01.png" alt="Figure 01">
+</p>
+
+From this angle it is not possible to observe, but changing the visualization and separating the layers, we can observe that the image is composed of 8 different images. (Note: the original asset has 10 layers, but I deleted two of them)
+
+<p align="center">
+<img width="400" src="/Figures/02.png" alt="Figure 02">
+</p>
+
+It is important that the images are superimposed on the same coordinate and that each one is linked to a different layer. Therefore, add the images to the scene, place them overlapping and change the value of the Order in Layer parameter in the Sprite Renderer component of each one of them so that the background image receives the value 0 and the following ones receive greater values, such as 1, 2, 3 and so on, resulting in the highest value for the closest image.
+
+<p align="center">
+<img width="1000" src="/Figures/03.png" alt="Figure 03">
+</p>
+
+In my case, as I have 8 images, the one on the last layer received the value 0 and the closest one received the value 7.
+
+<p align="center">
+<img width="400" src="/Figures/04.png" alt="Figure 04">
+</p>
+
+The next step is to triple each image that makes up the background. This step is important because while one background is displayed by the camera, the others will be held in standby. This procedure is interesting so that there is no moment when the application runs out of background. Therefore, the three must be positioned side by side, so that they complete each other. Thus, assuming that the camera is going to the right and reaches the end of the background on the right, the background on the left will be moved to this position, in order to give continuity to the scene. This process is repeated infinitely, giving the user a false feeling that the background is endless. Therefore, the images must be approximated.
+
+<p align="center">
+<img width="800" src="/Figures/07.png" alt="Figure 07">
+</p>
+
+And place them so that they complete each other.
+
+<p align="center">
+<img width="800" src="/Figures/08.png" alt="Figure 08">
+</p>
+
+In the Hierarchy, it is interesting to organize the images on the left as being superior to those on the right, as follows:
+
+<p align="center">
+<img width="400" src="/Figures/09.png" alt="Figure 09">
+</p>
+
+With all the images in the scene, it's important that an Empty Object be created to be established as the parent object for all the images. Likewise, this Empty Object must be added as associated with the Camera. In this case, an Empty Object with the name Background was added and the configuration in the scene was established as follows:
+
+<p align="center">
+<img width="400" src="/Figures/05.png" alt="Figure 05">
+</p>
+
+Now, for script creation, two main points need to be remembered:
+
+1. Each layer should move at a different speed, following the camera. The layer at the bottom moves the slowest, while the one closest to the camera moves the fastest.
+2. As the layers move at different speeds relative to the camera, at some point the camera will reach the end of the image. Therefore, the image must be generated again at this moment, maintaining the fluidity and continuity of the scenario.
+  
+In this case, create a new script. The name of the script was defined as Background. If you wish, you can use the same name.
+The initial script settings will be kept with the libraries normally already added when creating a script and with the Start() function. Change the Update() function by changing its name to FixedUpdate(). In this case, the use of FixedUpdate() is recommended as it is a fixed timer. Since Update() will be called depending on the frame rate, it may vary in certain cases. The stability of this call can generate a discontinuity in the background generation, which is not interesting for our project. That's why it's necessary to use FixedUpdate() so that the background update is done at a constant speed.
+
+First, let's start the main class by creating some variables:
+
+```
+private float length, startpos;
+public float parallaxEffect;
+public GameObject cam;
+private Vector3 initialBackgroundPosition;
+```
+
+Now, explaining each of the variables:
+
+- length: responsible for receiving the value of the total size in X of the image;
+- startpos: will receive the value of the initial X coordinate of the image to which the script will be associated;
+- parallaxEffect: public variable that will receive a value inversely proportional to the desired speed for the image. If the image is the slowest, it will receive the highest value. This value should range from 0 to 1;
+- cam: a GameObject that will be associated with the application's main camera. Associating the image to the camera, we can make it follow its movement;
+- initialBackgroundPosition: a Vector3 that will be associated with all images. It must be associated with the Empty Object that was created as a parent for all images.
+
+Before continuing the script, we can already define the values of the public parameters. First, this script must be added as a component of each of the images that make up the background. In my case, I added this script as a component of each of the 8 background images.
+Then, according to the image below, we determine the cam and parallaxEffect values.
+
+<p align="center">
+<img width="400" src="/Figures/06.png" alt="Figure 06">
+</p>
+
+For cam, just add the scene's main camera. For parallaxEffect, remember that a value inversely proportional to the desired speed for the image must be added. In this case, for each layer, the following values were added:
+
+- 0: 1
+- 1: 0.9
+- 2: 0.8
+- 3: 0.6
+- 4: 0.5
+- 5: 0.4
+- 6: 0.2
+- 7: 0.05
+
+Then for the Start() function:
+
+```
+void Start()
+    {
+        startpos = transform.position.x;
+        length = GetComponent<SpriteRenderer>().bounds.size.x;
+        initialBackgroundPosition = transform.position;
+    }
+```
+
+In this function, we are setting the values ​​of some of the variables:
+
+- The startpos variable is receiving the value of the image's initial X coordinate by checking the value of the position parameter of the Transform component of the image itself, which the script is part of as a component.
+- The variable length identifies the size of the X border of the image that was related to the variable itself.
+- The variable initialBackgroundPosition receives the Vector3 value of the coordinates of the initial position of the image which the script is part of as a component.
+
+Finally, for the FixedUpdate() function, it is necessary to deal with the most important parts of the code: the movement of the images and their renewal at the end of their segment.
+
+First, this function must create two variables of type float each time it is called. The first will be the temp variable, responsible for calculating how far the background moves in relation to the camera by calculating the X position of the camera at the moment the function is called multiplied by 1 minus the value of the parallaxEffect variable. This way, the greater the value of parallaxEffect, the smaller the movement. The second variable will be dist, responsible for calculating the distance moved in space by calculating the multiplication of the X position of the camera at the moment the function is called by the value of the parallaxEffect variable.
+
+```
+float temp = (cam.transform.position.x * (1 - parallaxEffect));
+float dist = (cam.transform.position.x * parallaxEffect); 
+```
+
+The dist variable is directly related to the movement of images with respect to the camera. Through this calculation it is possible to determine to which position the image should be moved, in order to follow the movement of the camera. This is done by checking the current position of the camera. As we have the initial positions of both the camera and the images already saved, we can determine the new initial position of the image from the movement of the camera. So, we use the line of code below, which updates the position of the image to which the script is related based on the sum of its initial position and the calculated value in dist. The positions in Y and Z remain the same, since the image only moves in the X axis.
+
+```
+transform.position = new Vector3(startpos + dist, initialBackgroundPosition.y, transform.position.z);
+```
+
+As explained initially, three images are being used. When the camera reaches the end of the image on the right, for example, the image on the left changes position, giving continuity to the image on the right. And so the process is carried out successively, creating an “infinite background sensation”, but it is just two backgrounds alternating on display for the camera.
+
+By adding movement to the camera on the X axis, it will be possible to observe the result, as demonstrated in the video at the link: https://www.youtube.com/watch?v=XY4BeuGwTpw
+
+To perform a test, in a simple way, just add movement to the camera. Create a new script, called CameraMovement for example, and add the line of code below to the Update() or FixedUpdate() function.
+
+```
+transform.position = new Vector3(transform.position.x + 1, transform.position.y, transform.position.z);
+```
+
+This line of code adds 1 to the camera's X position at each Update performed.
+
+## Conclusion
+
+As it was possible to observe, the application of the Parallax Scrolling effect is very simple to be carried out in Unity, taking only a few minutes. It is a very useful mechanic that generates an extra immersiveness for the user, improving the gaming experience.
