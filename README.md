@@ -50,7 +50,7 @@ In the Hierarchy, it is interesting to organize the images on the left as being 
 <img width="400" src="/Figures/09.png" alt="Figure 09">
 </p>
 
-With all the images in the scene, it's important that an Empty Object be created to be established as the parent object for all the images. Likewise, this Empty Object must be added as associated with the Camera. In this case, an Empty Object with the name Background was added and the configuration in the scene was established as follows:
+With all the images in the scene, it's important to position the camera to the position you want for your application, as well as make the appropriate display settings. Then, create an Empty Object to be established as the parent object of all images. Likewise, this Empty Object must be added as associated with the Camera. In this case, an Empty Object with the name Background was added and the configuration in the scene was established as follows:
 
 <p align="center">
 <img width="400" src="/Figures/05.png" alt="Figure 05">
@@ -146,3 +146,5 @@ This line of code adds 1 to the camera's X position at each Update performed.
 ## Conclusion
 
 As it was possible to observe, the application of the Parallax Scrolling effect is very simple to be carried out in Unity, taking only a few minutes. It is a very useful mechanic that generates an extra immersiveness for the user, improving the gaming experience.
+
+In case there is any doubt, the Background and CameraMovement scripts for testing are available in this repository.
