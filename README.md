@@ -8,3 +8,5 @@ To this end, this tutorial will present the basics for configurations and coding
 
 Therefore, it will be necessary to use a background image with several layers. If you already have one, feel free to use it. In this article, the Foggy Mountains Parallax Background asset available in the Unity Asset Store at the link https://assetstore.unity.com/packages/2d/textures-materials/foggy-mountains-parallax-background-142516#description will be used. Thanks to the author SimpleArt for making it available for free. Here is a link to the author's page https://assetstore.unity.com/publishers/41827.
 
+Continuing, the background image to be used is shown below:
+
